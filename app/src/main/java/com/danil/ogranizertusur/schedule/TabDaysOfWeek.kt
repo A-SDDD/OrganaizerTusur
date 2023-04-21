@@ -1,9 +1,8 @@
-package com.danil.ogranizertusur
+package com.danil.ogranizertusur.schedule
 
 import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -18,8 +17,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.danil.ogranizertusur.schedule.Week
-import com.danil.ogranizertusur.ui.theme.DoublePeriodCard
 import com.google.accompanist.pager.*
 import kotlinx.coroutines.*
 import org.jsoup.Jsoup
@@ -36,13 +33,14 @@ import java.util.*
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun TabDaysOfWeek() {
-    var tex = remember {
+    val tex = remember {
         mutableStateOf(listOf<Week>())
     }
+
     val week: Long by remember {
         mutableStateOf(0)
     }
-    val daysList = daysOfWeekS(week)
+    val daysList = remember{ daysOfWeekS(week) }
 
     val tabList = remember {
         mutableStateListOf(
@@ -54,33 +52,47 @@ fun TabDaysOfWeek() {
             "Сб.\n " + daysList[5]
         )
     }
-    val maxWeek = 54
-    val pagerState = rememberPagerState(initialPage = initialPage(tabList))
+    val sdf = remember { SimpleDateFormat("dd.MM")}
+    val currentDateAndTime = remember {sdf.format(Date())}
+
+    val maxWeek = remember {54}
+    val initPage = initialPage(tabList)
+    val pagerState = rememberPagerState(initialPage = initPage)
     val tabIndex = pagerState.currentPage
     val coroutineScope = rememberCoroutineScope()
     val pagerWeekState = rememberPagerState((maxWeek / 2))
 
-    Log.d("web", tex.value.toString())
+    //Log.d("web", tex.value.toString())
     LaunchedEffect(pagerWeekState) {
-        snapshotFlow { pagerWeekState.currentPage }.collect { page ->
+        snapshotFlow { pagerWeekState.currentPage }.collect {
+            if(pagerState.currentPage != initPage) {
+                coroutineScope.launch(Dispatchers.Main) {
 
-            coroutineScope.launch(Dispatchers.Default) {
-                var weekId =
-                    mutableStateOf(generationWeekId(pagerWeekState.currentPage - maxWeek / 2))
-
-                weekChanger(pagerWeekState.currentPage.toLong() - maxWeek / 2, tabList)
-                coroutineScope.launch(Dispatchers.IO) {
-                    getData2(tex, weekId.value)
-                    Log.d("web", tex.value.toString())
+                    pagerState.animateScrollToPage(0)
                 }
             }
-        }
-    }
+            coroutineScope.launch(Dispatchers.Default) {
 
-    LaunchedEffect(pagerState) {
-        snapshotFlow { pagerState.currentPage }.collect { page ->
+                val weekId =
+                    withContext(Dispatchers.Default) {
+                        mutableStateOf(generationWeekId(pagerWeekState.currentPage - maxWeek / 2))
+                    }
+                weekChanger(pagerWeekState.currentPage.toLong() - maxWeek / 2, tabList)
 
+                //launch {
+                    coroutineScope.launch(Dispatchers.IO) {
 
+                        withContext(Dispatchers.Default) {
+                            tex.value = listOf()
+                        }
+
+                       // launch {
+                                getData2(tex, weekId.value)
+                       // }
+                        Log.d("web", tex.value.size.toString())
+                    }
+                //}
+            }
         }
     }
 
@@ -99,7 +111,7 @@ fun TabDaysOfWeek() {
                 .fillMaxWidth(1f)
         ) {
             Row(
-                modifier = Modifier
+                modifier = Modifier.padding(start = 1.dp, bottom = 5.dp)
             ) {
                 TabRow(
                     selectedTabIndex = tabIndex,
@@ -109,25 +121,53 @@ fun TabDaysOfWeek() {
                         )
                     },
 
+
                     modifier = Modifier
                         .fillMaxWidth(1.0f)
                         .alpha(0.9f)
                         .clip(shape = RoundedCornerShape(5.dp))
-                        .border(
+                        /*.border(
                             width = 1.dp,
-                            color = Color.LightGray,
+                            color = Color.White,
                             shape = RoundedCornerShape(50.dp),
-                        ),
-                    backgroundColor = Color.LightGray
+                        )*/,
+                    backgroundColor = Color.White
                 ) {
 
                     tabList.forEachIndexed { index, text ->
+                        if (text.substringAfter(" ") == currentDateAndTime){
+                            Tab(
+                                selected = true, onClick = {
+                                    coroutineScope.launch(Dispatchers.Main) {
+                                        pagerState.animateScrollToPage(index)
+                                    }
 
+
+                                },
+
+                                text = {
+                                    Text(
+                                        text = text,
+                                        fontSize = 12.sp,
+                                        textAlign = TextAlign.Center,
+                                        color = Color.White
+                                    )
+                                }, modifier = Modifier
+                                    .background(
+                                        Color(0xFF2B5CA8),
+                                        RoundedCornerShape(20.dp)
+
+                                    )
+                                    .fillMaxHeight(1f)
+                                    .fillMaxWidth()
+                            )
+                        }
+                        else{
                         Tab(
                             selected = true, onClick = {
                                 coroutineScope.launch(Dispatchers.Main) {
                                     pagerState.animateScrollToPage(index)
-                                }
+                            }
 
                             },
 
@@ -135,15 +175,19 @@ fun TabDaysOfWeek() {
                                 Text(
                                     text = text,
                                     fontSize = 12.sp,
-                                    textAlign = TextAlign.Center
+                                    textAlign = TextAlign.Center,
+                                    color = Color.Black
                                 )
                             }, modifier = Modifier
                                 .background(
                                     if (pagerState.currentPage == index) Color.Gray else Color.LightGray,
-                                    RoundedCornerShape(5.dp)
+                                    RoundedCornerShape(20.dp)
+
                                 )
                                 .fillMaxHeight(1f)
                         )
+                    }
+
                     }
 
                 }
@@ -156,35 +200,56 @@ fun TabDaysOfWeek() {
                 .fillMaxWidth(1.0f)
                 .fillMaxHeight(1f)
 
-        ) { index ->
+        ) {
+
+
+          /*  when (it){
+
+                0-> coroutineScope.launch(Dispatchers.Main) {
+                    pagerWeekState.animateScrollToPage(pagerWeekState.currentPage-1)
+                    pagerState.animateScrollToPage(1)
+                }
+            }*/
+
 
 
             var week1: Week
+            if (tex.value != listOf<Week>()) {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxHeight(1f)
+                        .fillMaxWidth(1.0f)
+                ) {
 
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxHeight(1f)
-                    .fillMaxWidth(1.0f)
-            ) {
+
+                    itemsIndexed(tex.value)
+                    { count, _ ->
+
+                        if (count < 7) {
+                            var a = it * 7
+                            a += count
+                            if (it == 0) {
+                                a = count
+                            }
+
+                            week1 = tex.value[a]
 
 
-                itemsIndexed(tex.value)
-                { count, item ->
+                            DoublePeriodCard(week1)
 
-                    if (count < 7) {
-                        var a = pagerState.currentPage * 7
-                        a = a + count
-                        if (pagerState.currentPage == 0) {
-                            a = count
                         }
-                        week1 = tex.value.get(a)
-                        DoublePeriodCard(week1)
                     }
+
+
                 }
 
+            } else {
+                Text(
+                    text = "Ожидаем ответ сервера",
+                    fontSize = (60.sp),
+                    textAlign = TextAlign.Center
+                )
             }
-
-
         }
     }
 }
@@ -218,7 +283,7 @@ fun daysOfWeekS(first: Long = 0): List<String> {
 }
 
 suspend fun weekChanger(first: Long, tabList: SnapshotStateList<String>) {
-    coroutineScope() {
+    coroutineScope {
         val list = listOf("Пн.", "Вт.", "Ср.", "Чт.", "Пт.", "Сб.")
         Log.d("Изменение недели", "ДА да я работаю!")
         launch {
@@ -248,33 +313,37 @@ fun generationWeekId(int: Int): Int {
 
     val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
     val currentDateAndTime = sdf.format(Date())
-    val bgn = sdf.parse("2023-04-03 00:00:01")
+    val bgn = sdf.parse("2023-04-03 00:00:00")
     val end = sdf.parse(currentDateAndTime)
-    val milliseconds = end.time - bgn.time
+    val milliseconds = end!!.time - bgn!!.time
     val week = milliseconds / 1000 / 3600 / 24 / 7
 
     val startWeekId = 659
 
-    return startWeekId - week.toInt() + int
+    return startWeekId + week.toInt() + int
 }
 
-fun getData2(textt: MutableState<List<Week>>, week: Int) {
-    try {
-        val doca: Document
-        doca =
-            Jsoup.connect("https://timetable.tusur.ru/faculties/fvs/groups/532?week_id=$week").get()
-        Log.d("Conecting", week.toString())
-        val list = getData(doca)
-        textt.value = list
-    } catch (e: IOException) {
-        e.printStackTrace()
+ suspend fun getData2(textt: MutableState<List<Week>>, week: Int) {
+   CoroutineScope(Dispatchers.IO).launch {
+        try {
+            val doca: Document = async {
+                Jsoup.connect("https://timetable.tusur.ru/faculties/fvs/groups/552-m?week_id=$week")
+                    .get()
+            }.await()
+            Log.d("Conecting", week.toString())
 
+            val list = async {
+                getData(doca!!) }.await()
+            textt.value = list!!
+        } catch (e: IOException) {
+            e.printStackTrace()
+
+       }
     }
 
+ }
 
-}
-
-fun getData(doc: Document): List<Week> {
+ fun getData(doc: Document): List<Week> {
     val doca = doc
     // var doca = doc as Document
     var lessonElements: Elements
@@ -296,7 +365,7 @@ fun getData(doc: Document): List<Week> {
     var numClass: String?
     var numClassElements: Elements
     //list
-    var list = ArrayList<Week>()
+    val list = ArrayList<Week>()
     //var day = 2
     var lessonsCellElement: Elements
     Log.d("Starting", "Стартуем")

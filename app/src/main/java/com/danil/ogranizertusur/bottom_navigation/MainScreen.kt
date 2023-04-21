@@ -4,14 +4,16 @@ import android.annotation.SuppressLint
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.rememberNavController
+import com.danil.ogranizertusur.workspace.viewmodel.AddActivityViewModel
+import com.danil.ogranizertusur.workspace.viewmodel.AddActivityViewModelAbstract
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun MainScreen (/*list: MutableState<List<Week>>, weekPagerState: MutableState<Int>*/){
+fun MainScreen (addViewModel: AddActivityViewModel /*list: MutableState<List<Week>>, weekPagerState: MutableState<Int>*/){
     val navController = rememberNavController()
     Scaffold(
         bottomBar = {BottomNavigation(navController = navController)}
     ) {
-        NavGraph(navHostController = navController)
+        NavGraph(navHostController = navController, addViewModel = addViewModel)
     }
 }

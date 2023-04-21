@@ -9,9 +9,10 @@
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:name=".workspace.AddActivityApp"
         android:supportsRtl="true"
         android:theme="@style/Theme.OgranizerTusur"
-        tools:targetApi="31">
+        tools:targetApi="27">
         <activity
             android:name=".MainActivity"
             android:exported="true"

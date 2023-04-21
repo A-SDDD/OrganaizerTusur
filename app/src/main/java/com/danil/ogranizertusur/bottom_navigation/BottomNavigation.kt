@@ -36,7 +36,8 @@ fun BottomNavigation (navController: NavController) {
         label = {
             Text(text = item.tittle, fontSize = 9.sp)
         },
-                selectedContentColor = Color.Blue
+                selectedContentColor = Color.Blue,
+                unselectedContentColor = Color(0xFFA3C6FB)
         )
 
 

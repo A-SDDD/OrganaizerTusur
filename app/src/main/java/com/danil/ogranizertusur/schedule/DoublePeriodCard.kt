@@ -1,4 +1,4 @@
-package com.danil.ogranizertusur.ui.theme
+package com.danil.ogranizertusur.schedule
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.*
@@ -14,13 +14,11 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.danil.ogranizertusur.schedule.Week
 
 
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun DoublePeriodCard(item: Week) {
-    val h = 600 / 7
     Card(
         modifier = Modifier
             //.width(1f)
