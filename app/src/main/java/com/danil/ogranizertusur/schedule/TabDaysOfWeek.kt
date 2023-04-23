@@ -36,7 +36,6 @@ fun TabDaysOfWeek() {
     val tex = remember {
         mutableStateOf(listOf<Week>())
     }
-
     val week: Long by remember {
         mutableStateOf(0)
     }
@@ -54,15 +53,15 @@ fun TabDaysOfWeek() {
     }
     val sdf = remember { SimpleDateFormat("dd.MM")}
     val currentDateAndTime = remember {sdf.format(Date())}
-
     val maxWeek = remember {54}
+
     val initPage = initialPage(tabList)
+
     val pagerState = rememberPagerState(initialPage = initPage)
     val tabIndex = pagerState.currentPage
     val coroutineScope = rememberCoroutineScope()
     val pagerWeekState = rememberPagerState((maxWeek / 2))
 
-    //Log.d("web", tex.value.toString())
     LaunchedEffect(pagerWeekState) {
         snapshotFlow { pagerWeekState.currentPage }.collect {
             if(pagerState.currentPage != initPage) {
@@ -77,18 +76,15 @@ fun TabDaysOfWeek() {
                     withContext(Dispatchers.Default) {
                         mutableStateOf(generationWeekId(pagerWeekState.currentPage - maxWeek / 2))
                     }
+
                 weekChanger(pagerWeekState.currentPage.toLong() - maxWeek / 2, tabList)
 
-                //launch {
                     coroutineScope.launch(Dispatchers.IO) {
 
                         withContext(Dispatchers.Default) {
                             tex.value = listOf()
                         }
-
-                       // launch {
-                                getData2(tex, weekId.value)
-                       // }
+                            getData2(tex, weekId.value)
                         Log.d("web", tex.value.size.toString())
                     }
                 //}
@@ -136,6 +132,7 @@ fun TabDaysOfWeek() {
 
                     tabList.forEachIndexed { index, text ->
                         if (text.substringAfter(" ") == currentDateAndTime){
+
                             Tab(
                                 selected = true, onClick = {
                                     coroutineScope.launch(Dispatchers.Main) {
@@ -332,9 +329,12 @@ fun generationWeekId(int: Int): Int {
             }.await()
             Log.d("Conecting", week.toString())
 
-            val list = async {
-                getData(doca!!) }.await()
-            textt.value = list!!
+           // val list =
+            withContext(Dispatchers.Default){textt.value =  getData(doca!!)}
+
+                //async {   }.await()
+
+                //list!!
         } catch (e: IOException) {
             e.printStackTrace()
 

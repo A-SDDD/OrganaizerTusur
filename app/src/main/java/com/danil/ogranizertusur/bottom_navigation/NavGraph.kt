@@ -1,6 +1,6 @@
 package com.danil.ogranizertusur.bottom_navigation
 
-import com.danil.ogranizertusur.workspace.AddNoteScreen
+import com.danil.ogranizertusur.workspace.screens.AddNoteScreen
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
@@ -13,14 +13,17 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.danil.ogranizertusur.R
 import com.danil.ogranizertusur.schedule.TabDaysOfWeek
-import com.danil.ogranizertusur.workspace.AddActivity
+import com.danil.ogranizertusur.workspace.screens.AddActivity
 import com.danil.ogranizertusur.workspace.viewmodel.AddActivityViewModel
 
 
 @Composable
 fun NavGraph(
     navHostController: NavHostController,
-    addViewModel: AddActivityViewModel,/*, list: MutableState<List<Week>>, weekPagerState: MutableState<Int>*/
+    addViewModel: AddActivityViewModel,
+
+
+    /*, list: MutableState<List<Week>>, weekPagerState: MutableState<Int>*/
 ) {
 
     NavHost(navController = navHostController, startDestination = "screen_1") {
@@ -85,7 +88,7 @@ fun NavGraph(
             AddNoteScreen(addViewModel,
                 onClickClose = {
                     navHostController.popBackStack()
-                }
+                },
 
             )
         }

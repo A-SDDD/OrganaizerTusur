@@ -1,4 +1,4 @@
-package com.danil.ogranizertusur.workspace
+package com.danil.ogranizertusur.workspace.screens
 
 import android.app.Application
 import dagger.hilt.android.HiltAndroidApp
