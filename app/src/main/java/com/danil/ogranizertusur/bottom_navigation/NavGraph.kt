@@ -23,9 +23,8 @@ fun NavGraph(
     addViewModel: AddActivityViewModel,
 
 
-    /*, list: MutableState<List<Week>>, weekPagerState: MutableState<Int>*/
-) {
 
+) {
     NavHost(navController = navHostController, startDestination = "screen_1") {
 
         composable("screen_1") {

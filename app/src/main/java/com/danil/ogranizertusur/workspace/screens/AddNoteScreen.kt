@@ -48,25 +48,9 @@ fun AddNoteScreen(
     //dataPicker values
     val mContext = LocalContext.current
 
-    val mDay: Int
-    val mMonth: Int
-    val mYear: Int
-
+ 
     val mCalendar = Calendar.getInstance()
 
-    mDay = mCalendar.get(Calendar.DAY_OF_MONTH)
-    mMonth = mCalendar.get(Calendar.MONTH)
-    mYear = mCalendar.get(Calendar.YEAR)
-
-   /* val mDate = remember { mutableStateOf("") }
-
-    val mDatePickerDialog = DatePickerDialog(
-        mContext,
-        { _: DatePicker, mYear: Int, mMonth: Int, mDayOfMonth: Int ->
-            dateState.value = "$mDayOfMonth.${mMonth+1}.$mYear"
-        }, mYear, mMonth, mDay
-    )
-*/
     var pickedDate by remember {
         mutableStateOf(LocalDate.now())
     }
@@ -104,7 +88,7 @@ fun AddNoteScreen(
         mContext,
         {_, mHour : Int, mMinute: Int ->
             var minute = mMinute.toString()
-            var hour = mHour.toString()
+            val hour = mHour.toString()
             if(mMinute.toString().length == 1){
                 minute = "0$mMinute"
             }
@@ -120,10 +104,6 @@ fun AddNoteScreen(
                     Text(text = "Задача", fontSize = 24.sp)
                 },
                 actions = {
-                    /*  Row(
-                          modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
-                      ) {*/
-
                     IconButton(onClick = {
                         note?.let {
                             addViewModel.addOrUpdateWorkspace(
@@ -134,6 +114,11 @@ fun AddNoteScreen(
                                     status = statusState.value
                                 )
                             )
+                            Toast.makeText(
+                                mContext.applicationContext,
+                                "Задача добавлена",
+                                Toast.LENGTH_LONG
+                            ).show()
                         } ?: run {
                             addViewModel.addOrUpdateWorkspace(
                                 WorkSpaceEntity(
@@ -143,6 +128,11 @@ fun AddNoteScreen(
                                     status = statusState.value
                                 )
                             )
+                            Toast.makeText(
+                                mContext.applicationContext,
+                                "Задача добавлена",
+                                Toast.LENGTH_LONG
+                            ).show()
                         }
                         onClickClose()
                     }) {

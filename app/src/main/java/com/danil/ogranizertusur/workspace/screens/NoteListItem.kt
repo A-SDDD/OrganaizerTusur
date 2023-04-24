@@ -18,7 +18,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.danil.ogranizertusur.workspace.room_model.WorkSpaceEntity
+import com.danil.ogranizertusur.workspace.viewmodel.AddActivityViewModelAbstract
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -28,6 +30,7 @@ fun NoteListItem(
     onDelete: () -> Unit,
     note: WorkSpaceEntity,
     dismissState: DismissState,
+    addViewModel: AddActivityViewModelAbstract
 ) {
     SwipeToDismiss(state = dismissState,
         background = {
@@ -85,7 +88,11 @@ fun NoteListItem(
 
                 .height(54.dp),
         ) {
-            Text(
+
+
+            NoteItemCard(note = note, addViewModel)
+
+          /*  Text(
                 modifier = Modifier
                     .align(Alignment.CenterStart),
                 text = note.date
@@ -99,7 +106,7 @@ fun NoteListItem(
                 modifier = Modifier
                     .align(Alignment.CenterEnd),
                 text = note.text
-            )
+            )*/
         }
 
     }
