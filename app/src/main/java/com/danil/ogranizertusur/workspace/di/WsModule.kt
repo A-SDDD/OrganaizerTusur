@@ -18,21 +18,21 @@ class WsModule {
     @Singleton
     @Provides
     fun provideWorkspaceRepository(
-        workspaceDao: WorkspaceDao
-    ):WorkspaceRepository{
-        return WorkspaceRepository(workspaceDao= workspaceDao)
+        workspaceDao: WorkspaceDao,
+    ): WorkspaceRepository {
+        return WorkspaceRepository(workspaceDao = workspaceDao)
     }
 
     @Singleton
     @Provides
-    fun provideAppDatabase(app: Application): AppDatabase{
+    fun provideAppDatabase(app: Application): AppDatabase {
         return AppDatabase.getInstance(context = app)
     }
 
 
     @Singleton
     @Provides
-    fun provideWorkspaceDao (appDatabase: AppDatabase): WorkspaceDao{
+    fun provideWorkspaceDao(appDatabase: AppDatabase): WorkspaceDao {
         return appDatabase.workspaceDao()
     }
 }

@@ -1,7 +1,7 @@
 package com.danil.ogranizertusur.schedule
 
 
-data class Week(
+data class ScheduleInfoDataClass(
     val timeBegin: String?,
     val timeEnd: String?,
     var obj: String?,

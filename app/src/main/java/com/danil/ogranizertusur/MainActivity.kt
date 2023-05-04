@@ -21,7 +21,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         val addViewModel: AddActivityViewModel by viewModels()
         setContent {
-            OgranizerTusurTheme {
+            OgranizerTusurTheme (){
                 Column() {
                     MainScreen(addViewModel = addViewModel)
                 }

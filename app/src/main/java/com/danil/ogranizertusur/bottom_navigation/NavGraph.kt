@@ -1,6 +1,6 @@
 package com.danil.ogranizertusur.bottom_navigation
 
-import com.danil.ogranizertusur.workspace.screens.AddNoteScreen
+import com.danil.ogranizertusur.workspace.screens.add_edit_notes.AddNoteScreen
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
@@ -12,8 +12,10 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.danil.ogranizertusur.R
-import com.danil.ogranizertusur.schedule.TabDaysOfWeek
-import com.danil.ogranizertusur.workspace.screens.AddActivity
+import com.danil.ogranizertusur.news.screens.NewsInfo
+import com.danil.ogranizertusur.news.screens.NewsScreen
+import com.danil.ogranizertusur.schedule.screens.TabDaysOfWeek
+import com.danil.ogranizertusur.workspace.screens.notes.AddActivity
 import com.danil.ogranizertusur.workspace.viewmodel.AddActivityViewModel
 
 
@@ -21,21 +23,11 @@ import com.danil.ogranizertusur.workspace.viewmodel.AddActivityViewModel
 fun NavGraph(
     navHostController: NavHostController,
     addViewModel: AddActivityViewModel,
-
-
-
 ) {
     NavHost(navController = navHostController, startDestination = "screen_1") {
 
         composable("screen_1") {
-            Image(
-                painter = painterResource(id = R.drawable.fon),
-                contentDescription = "fon1",
-                modifier = Modifier
-                    .fillMaxSize()
-                    .alpha(0.7f),
-                contentScale = ContentScale.FillBounds
-            )
+
             TabDaysOfWeek()
         }
 
@@ -72,15 +64,18 @@ fun NavGraph(
         }
 
         composable("screen_4") {
-            Image(
+            /*Image(
                 painter = painterResource(id = R.drawable.fon),
                 contentDescription = "fon4",
                 modifier = Modifier
                     .fillMaxSize()
                     .alpha(0.7f),
                 contentScale = ContentScale.FillBounds
+            )*/
+            NewsScreen(onClickNews = {
+                navHostController.navigate("newsInfo")
+            }
             )
-            TabDaysOfWeek()
         }
 
         composable("addNote") {
@@ -90,6 +85,9 @@ fun NavGraph(
                 },
 
             )
+        }
+        composable("newsInfo"){
+            NewsInfo()
         }
 
     }

@@ -1,4 +1,4 @@
-package com.danil.ogranizertusur.schedule
+package com.danil.ogranizertusur.schedule.screens
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.*
@@ -14,18 +14,24 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.danil.ogranizertusur.schedule.ScheduleInfoDataClass
 
 
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
-fun DoublePeriodCard(item: Week) {
+fun DoublePeriodCard(item: ScheduleInfoDataClass) {
+    val itemSubstringsList: List<String> = if (item.numClass != "") {
+        item.numClass!!.split(", ")
+    } else {
+        listOf("")
+    }
+    val chunked = itemSubstringsList.chunked(3)
     Card(
         modifier = Modifier
-            //.width(1f)
             .fillMaxWidth(1f)
-            .fillMaxHeight(0.125f)
+            .fillMaxHeight(0.100f)
             .alpha(0.9f)
-            .padding(top = 3.dp),
+            .padding(top = 3.dp, start = 2.dp, end = 2.dp),
         shape = RoundedCornerShape(5.dp),
         elevation = 0.dp,
         backgroundColor = Color.DarkGray
@@ -33,7 +39,8 @@ fun DoublePeriodCard(item: Week) {
         Row(
             modifier = Modifier
                 .fillMaxHeight(1f)
-                .padding(top = 5.dp, start = 5.dp, end = 5.dp), Arrangement.SpaceBetween
+                .padding(top = 5.dp, start = 5.dp, end = 2.dp),
+            Arrangement.SpaceBetween
         ) {
             Column (modifier = Modifier.fillMaxHeight(1f)){
                 Text(text = item.timeBegin.toString().ifEmpty { "" }, style = TextStyle(Color.White))
@@ -52,7 +59,7 @@ fun DoublePeriodCard(item: Week) {
                         textAlign = TextAlign.Center,
 
                         style = TextStyle(Color.White),
-                        modifier = Modifier.padding(bottom = 10.dp)
+                        modifier = Modifier.padding(bottom = 8.dp)
                     )
                     Text(
                         text = item.prepod.toString().ifEmpty { "" },
@@ -63,8 +70,13 @@ fun DoublePeriodCard(item: Week) {
                     )
 
             }
+            Column{
+            chunked[0].forEachIndexed { _, s->
+                    Text(text = s.ifEmpty { "     " }, style = TextStyle(Color.White))
 
-            Text(text = item.numClass.toString().ifEmpty { "" }, style = TextStyle(Color.White))
+            }
+        }
+
         }
 
     }

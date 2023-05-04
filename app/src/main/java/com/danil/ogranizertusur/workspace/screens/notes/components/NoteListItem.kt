@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalMaterialApi::class)
 
-package com.danil.ogranizertusur.workspace.screens
+package com.danil.ogranizertusur.workspace.screens.notes.components
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
@@ -18,7 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import com.danil.ogranizertusur.ui.theme.LightBlue
 import com.danil.ogranizertusur.workspace.room_model.WorkSpaceEntity
 import com.danil.ogranizertusur.workspace.viewmodel.AddActivityViewModelAbstract
 
@@ -33,11 +33,12 @@ fun NoteListItem(
     addViewModel: AddActivityViewModelAbstract
 ) {
     SwipeToDismiss(state = dismissState,
+        directions = setOf(DismissDirection.EndToStart),
         background = {
             val direction = dismissState.dismissDirection ?: return@SwipeToDismiss
             val color by animateColorAsState(
                 when (dismissState.targetValue) {
-                    DismissValue.Default -> Color.Blue
+                    DismissValue.Default -> LightBlue
                     DismissValue.DismissedToEnd -> Color.Red
                     DismissValue.DismissedToStart -> Color.Red
                 }
@@ -77,36 +78,15 @@ fun NoteListItem(
                 .combinedClickable(
                     onClick = {
                         onClick()
-                        /*addViewModel.selectedNote(note)
-                        onClickNote(note)*/
                     },
                     onLongClick = {
-                        onDelete()
-                        // addViewModel.deleteWorkspace(note)
+
+                        //
+                        //onDelete()
                     }
                 )
-
-                .height(54.dp),
         ) {
-
-
             NoteItemCard(note = note, addViewModel)
-
-          /*  Text(
-                modifier = Modifier
-                    .align(Alignment.CenterStart),
-                text = note.date
-            )
-            Text(
-                modifier = Modifier
-                    .align(Alignment.Center),
-                text = note.time
-            )
-            Text(
-                modifier = Modifier
-                    .align(Alignment.CenterEnd),
-                text = note.text
-            )*/
         }
 
     }

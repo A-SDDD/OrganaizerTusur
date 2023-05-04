@@ -1,4 +1,4 @@
-package com.danil.ogranizertusur.workspace.screens
+package com.danil.ogranizertusur.workspace.screens.add_edit_notes
 
 import android.app.TimePickerDialog
 import android.widget.Toast
@@ -25,7 +25,6 @@ import com.danil.ogranizertusur.workspace.room_model.WorkSpaceEntity
 import com.danil.ogranizertusur.workspace.viewmodel.AddActivityViewModelAbstract
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.datetime.date.datepicker
-import com.vanpra.composematerialdialogs.datetime.time.timepicker
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import java.time.LocalDate
 import java.time.LocalTime
@@ -40,9 +39,9 @@ fun AddNoteScreen(
     onClickClose: () -> Unit,
 ) {
     val note = addViewModel.selectedNoteState.value
-    val textState = rememberSaveable { mutableStateOf(note?.text ?: " ") }
-    val dateState = rememberSaveable { mutableStateOf(note?.date ?: " ") }
-    val timeState = rememberSaveable { mutableStateOf(note?.time ?: " ") }
+    val textState = rememberSaveable { mutableStateOf(note?.text ?: "") }
+    val dateState = rememberSaveable { mutableStateOf(note?.date ?: "") }
+    val timeState = rememberSaveable { mutableStateOf(note?.time ?: "") }
     val statusState = rememberSaveable { mutableStateOf(note?.status ?: false) }
 
     //dataPicker values
@@ -72,7 +71,7 @@ fun AddNoteScreen(
         }
     }
     val dateDialogState = rememberMaterialDialogState()
-    val timeDialogState = rememberMaterialDialogState()
+   // val timeDialogState = rememberMaterialDialogState()
     //timePicker
 
     // Declaring and initializing a calendar
@@ -105,36 +104,52 @@ fun AddNoteScreen(
                 },
                 actions = {
                     IconButton(onClick = {
-                        note?.let {
-                            addViewModel.addOrUpdateWorkspace(
-                                it.copy(
-                                    date = dateState.value,
-                                    time = timeState.value,
-                                    text = textState.value,
-                                    status = statusState.value
+                        if (dateState.value.isNotEmpty()
+                            && timeState.value.isNotEmpty()
+                            && textState.value.isNotEmpty()
+                            && textState.value != " "
+                        ) {
+                            note?.let {
+
+
+                                addViewModel.addOrUpdateWorkspace(
+
+                                    it.copy(
+                                        date = dateState.value,
+                                        time = timeState.value,
+                                        text = textState.value,
+                                        status = statusState.value
+                                    )
                                 )
-                            )
+                                Toast.makeText(
+                                    mContext.applicationContext,
+                                    "Задача обнавлена",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            } ?: run {
+
+                                addViewModel.addOrUpdateWorkspace(
+                                    WorkSpaceEntity(
+                                        date = dateState.value,
+                                        time = timeState.value,
+                                        text = textState.value,
+                                        status = statusState.value
+                                    )
+                                )
+                                Toast.makeText(
+                                    mContext.applicationContext,
+                                    "Задача добавлена",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            }
+                            onClickClose()
+                        } else {
                             Toast.makeText(
                                 mContext.applicationContext,
-                                "Задача добавлена",
-                                Toast.LENGTH_LONG
-                            ).show()
-                        } ?: run {
-                            addViewModel.addOrUpdateWorkspace(
-                                WorkSpaceEntity(
-                                    date = dateState.value,
-                                    time = timeState.value,
-                                    text = textState.value,
-                                    status = statusState.value
-                                )
-                            )
-                            Toast.makeText(
-                                mContext.applicationContext,
-                                "Задача добавлена",
+                                "Заполните информацию задачи",
                                 Toast.LENGTH_LONG
                             ).show()
                         }
-                        onClickClose()
                     }) {
                         Icon(imageVector = Icons.Rounded.Done, contentDescription = "Save")
                     }
@@ -277,7 +292,7 @@ fun AddNoteScreen(
         }
     }
 
-    MaterialDialog(
+   /* MaterialDialog(
         dialogState = timeDialogState,
         properties = DialogProperties(
             dismissOnClickOutside = true
@@ -302,5 +317,5 @@ fun AddNoteScreen(
             pickedTime = it
             timeState.value = formattedTime
         }
-    }
+    }*/
 }
