@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
@@ -22,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.danil.ogranizertusur.R
 import com.danil.ogranizertusur.schedule.ScheduleInfoDataClass
+import com.danil.ogranizertusur.schedule.domain.model.Schedule
 import com.danil.ogranizertusur.ui.theme.LightBlue
 import com.google.accompanist.pager.*
 import kotlinx.coroutines.*
@@ -39,7 +41,9 @@ import java.util.*
 )
 @OptIn(ExperimentalPagerApi::class)
 @Composable
-fun TabDaysOfWeek() {
+fun TabDaysOfWeek(scheduleViewModel:ScheduleViewModel) {
+
+    val itemListState = scheduleViewModel.scheduleListFlow.collectAsState(initial = listOf(Schedule(faculty = "ф.", group = "гр.")))
 
     val scaffoldState = rememberScaffoldState()
 
@@ -54,7 +58,7 @@ fun TabDaysOfWeek() {
     val faculty  = remember {
         mutableStateOf("ф.")
     }
-    val group  = remember {
+    val group  = rememberSaveable {
         mutableStateOf("гр.")
     }
     val update = remember {
@@ -103,11 +107,13 @@ fun TabDaysOfWeek() {
     val initPage = initialPage(tabList)
 
     val pagerState = rememberPagerState(initialPage = initPage)
-    val tabIndex = pagerState.currentPage
+    val tabIndex = remember{pagerState.currentPage}
     val coroutineScope = rememberCoroutineScope()
     val pagerWeekState = rememberPagerState((maxWeek / 2))
 
+
     if(faculty.value != "ф." && facultyOrGroups.value == 2)
+    //if(itemListState.value[0].faculty != "" && facultyOrGroups.value == 2)
     coroutineScope.launch(Dispatchers.IO) {
         groupsByFaculty.value = listOf()
         getGroupsByFaculties(faculty,groupsByFaculty)
@@ -115,20 +121,23 @@ fun TabDaysOfWeek() {
 
     if (update.value == 2){
         coroutineScope.launch(Dispatchers.IO) {
-            val weekId =
-                mutableStateOf(generationWeekId(pagerWeekState.currentPage - maxWeek / 2))
+            val weekId = mutableStateOf(generationWeekId(pagerWeekState.currentPage - maxWeek / 2))
             scheduleWeek.value= listOf()
-            getData2(scheduleWeek, weekId.value, faculty, group.value)
+            getScheduleDocument(scheduleWeek, weekId.value, itemListState.value[0].faculty, group.value)
             update.value = 1
         }
     }
 
-    LaunchedEffect(pagerWeekState.currentPage) {
+    LaunchedEffect(pagerWeekState.currentPage,itemListState.value) {
         try {
             snapshotFlow { pagerWeekState }.collect {
-                if (pagerState.currentPage != initPage) {
+                if (pagerWeekState.currentPage != 54/2) {
                     coroutineScope.launch(Dispatchers.Main) {
                         pagerState.animateScrollToPage(0)
+                    }
+                } else{
+                    coroutineScope.launch(Dispatchers.Main) {
+                        pagerState.animateScrollToPage(initPage)
                     }
                 }
 
@@ -144,10 +153,13 @@ fun TabDaysOfWeek() {
                             scheduleWeek.value = listOf()
                         }
 
-                        if(faculty.value != "ф."
+                       /* if(faculty.value != "ф."
                             && group.value !="гр."
-                        ){
-                            getData2(scheduleWeek, weekId.value, faculty, group.value)
+                        )*/
+                        Log.d("group",itemListState.value[0].group)
+                        if(itemListState.value[0].group!="гр."){
+                            //getScheduleDocument(scheduleWeek, weekId.value, faculty, group.value)
+                            getScheduleDocument(scheduleWeek, weekId.value, itemListState.value[0].faculty, itemListState.value[0].group)
                         }
 
 
@@ -177,8 +189,10 @@ fun TabDaysOfWeek() {
                             faculty,
                             groupsByFaculty,
                             facultyOrGroups,
+                            itemListState,
                             group,
-                            update
+                            update,
+                            scheduleViewModel
                         )
                         Button(
                             onClick = {
@@ -381,19 +395,19 @@ fun TabDaysOfWeek() {
                             .fillMaxWidth(1.0f)
                     ) {
 
-
+                        if(scheduleDay[ara].isNotEmpty()){
                         itemsIndexed(scheduleDay[ara])
                         { _, text ->
 
                             doublePeriodInfo.value = text
                             DoublePeriodCard(doublePeriodInfo.value)
                         }
-
+                    }
 
                     }
 
                 } else {
-                    if(faculty.value == "ф." || group.value =="гр."){
+                    if( itemListState.value[0].group =="гр."){
                         Text(
                             text = "Выберите факультет и группу",
                             fontSize = (60.sp),
@@ -411,15 +425,16 @@ fun TabDaysOfWeek() {
     }
 }
 
-fun initialPage(listOf: List<String>): Int {
-    /*/val sdf = SimpleDateFormat("dd.MM")
-    val currentDateAndTime = sdf.format(Date())*/
+fun initialPage(tabList: List<String>): Int {
+
     val currentDateAndTime = DateTimeFormatter.ofPattern(
         "dd.MM",
         Locale.getDefault()
     ).format(LocalDateTime.now())
+
     var a = 5
-    listOf.forEachIndexed { index, text ->
+
+    tabList.forEachIndexed { index, text ->
         if (text.substringAfter(" ") == currentDateAndTime) a = index
     }
     return a
@@ -447,7 +462,6 @@ fun daysOfWeekS(first: Long = 0): List<String> {
 suspend fun weekChanger(first: Long, tabList: SnapshotStateList<String>) {
     coroutineScope {
         val list = listOf("Пн.", "Вт.", "Ср.", "Чт.", "Пт.", "Сб.")
-        Log.d("Изменение недели", "ДА да я работаю!")
         launch {
             for (i in 0 until 6) {
                 tabList.set(i, list[i] + "\n " + daysOfWeekS(first)[i])
@@ -478,9 +492,8 @@ fun generationWeekId(int: Int): Int {
 }
 
 //function for getting html doc from Tusur.ru
-suspend fun getData2(scheduleWeek: MutableState<List<ScheduleInfoDataClass>>, week: Int, faculty:MutableState<String>, group: String ) {
-
-    val retranslator = group
+suspend fun getScheduleDocument(scheduleWeek: MutableState<List<ScheduleInfoDataClass>>, week: Int, faculty:String, group: String ) {
+    val replacedGroup = group
         .replace("з", "z")
         .replace("в","v")
         .replace("С","s")
@@ -493,31 +506,24 @@ suspend fun getData2(scheduleWeek: MutableState<List<ScheduleInfoDataClass>>, we
         .replace("Р","r")
         .replace("М","m")
         .replace("инд","ind")
-    Log.d("Группа",retranslator)
     CoroutineScope(Dispatchers.IO).launch {
         try {
             val doc: Document = async {
-                Jsoup.connect("https://timetable.tusur.ru/faculties/${faculty.value}/groups/$retranslator?week_id=$week")
+                Jsoup.connect("https://timetable.tusur.ru/faculties/${faculty}/groups/$replacedGroup?week_id=$week")
                     .get()
             }.await()
-            Log.d("Conecting", week.toString())
 
-            // val list =
-            withContext(Dispatchers.Default) { scheduleWeek.value = getData(doc) }
-
-            //async {   }.await()
-
-            //list!!
+            withContext(Dispatchers.Default) {
+                scheduleWeek.value = getScheduleParsing(doc)
+            }
         } catch (e: IOException) {
             e.printStackTrace()
-
         }
     }
-
 }
 
 //function for parsing schedule page from Tusur.ru
-fun getData(doc: Document): List<ScheduleInfoDataClass> {
+fun getScheduleParsing(doc: Document): List<ScheduleInfoDataClass> {
     var lessonElements: Elements
     //time
     var timeElement: Elements
@@ -530,9 +536,9 @@ fun getData(doc: Document): List<ScheduleInfoDataClass> {
     //type of object
     var objTypeElement: Elements
     var objType: String?
-    //prepods
-    var prepodElement: Elements
-    var prepod: String?
+    //teachers
+    var teachersElement: Elements
+    var teachers: String?
     //numClasses
     var numClass: String?
     var numClassElements: Elements
@@ -564,11 +570,11 @@ fun getData(doc: Document): List<ScheduleInfoDataClass> {
                 .select("div[class=hidden for_print]").eq(0)
             objType = objTypeElement.eq(0).select("span[class=kind]").eq(0).text()
 
-            prepodElement = lessonsCellElement.select("div[class=lesson-cell]")
+            teachersElement = lessonsCellElement.select("div[class=lesson-cell]")
                 .select("div[class=hidden for_print]").eq(0)
-            prepod = prepodElement.eq(0).select("span[class=group]").eq(0).text()
-            if (prepod.length > 40) {
-                prepod = prepod.substring(0, 40)
+            teachers = teachersElement.eq(0).select("span[class=group]").eq(0).text()
+            if (teachers.length > 40) {
+                teachers = teachers.substring(0, 40)
             }
 
             numClassElements =
@@ -584,7 +590,7 @@ fun getData(doc: Document): List<ScheduleInfoDataClass> {
                     timeEnd,
                     obj,
                     objType,
-                    prepod,
+                    teachers,
                     numClass
                 )
             )
@@ -605,8 +611,6 @@ suspend fun getGroupsByFaculties(faculty:MutableState<String>,groupsByFaculty:Mu
 
         }
     }
-
-
 }
 fun getGroupsParsing(doc: Document):List<String>{
 
@@ -617,7 +621,5 @@ fun getGroupsParsing(doc: Document):List<String>{
     for (i in 0 until lessonElements.size){
         list.add(lessonElements.eq(i).text())
     }
-    Log.d(" chek", list.toString())
     return list
-
 }

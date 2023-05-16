@@ -71,13 +71,13 @@ fun AddActivity(
     {
 
         Box(modifier = Modifier.padding(it)) {
-            Column() {
+            Column {
                 TabLayout(
                     tabList = tabList,
                     pagerState = pagerState,
                     tabIndex = tabIndex
                 )
-                LazyColumn() {
+                LazyColumn {
                     item {
 
                         Text(

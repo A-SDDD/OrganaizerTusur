@@ -39,6 +39,7 @@ interface AddActivityViewModelAbstract {
     fun deleteWorkspace(workspace: WorkSpaceEntity)
     fun selectedNote(workspace: WorkSpaceEntity)
     fun resetSelectedNote()
+
 }
 
 @HiltViewModel
@@ -57,7 +58,12 @@ class AddActivityViewModel
     override val workspaceListFlow: Flow<List<WorkSpaceEntity>> =
         workspaceRepository.getAllFlow().map { notes ->
             notes.sortedWith(
-                compareBy({ LocalDate.parse(it.date, DateTimeFormatter.ofPattern("dd.MM.yyyy")) },
+                compareBy({
+                    LocalDate.parse(
+                        it.date,
+                        DateTimeFormatter.ofPattern("dd.MM.yyyy")
+                    )
+                },
                     {
                         LocalTime.parse(
                             it.time,
@@ -104,15 +110,25 @@ class AddActivityViewModel
         _selectedNoteState.value = null
     }
 
+
     /*override fun notifyUser(workspace: WorkSpaceEntity) {
         //TODO("Not yet implemented")
     }*/
 
 
-    //init {
+    init {
+        var t = ""
+    workspaceListFlow.map { notes->
 
+        notes.forEachIndexed{index,note->
+            t=note.time
+        }
+    }
 
-       // createNotificationChannel(context = Graph.appContext)
+       /* createNotificationChannel(context = Graph.appContext)
+        setOneTimeNotification(addViewModel = this@AddActivityViewModel,
+            WorkSpaceEntity(1,"",t,"",true)
+        )*/
 
         //setOneTimeNotification(this@AddActivityViewModel)
 
@@ -123,11 +139,11 @@ class AddActivityViewModel
         }*/
 
 
-    //}
+    }
 
 }
 
-/*private fun setOneTimeNotification(addViewModel: AddActivityViewModelAbstract){
+private fun setOneTimeNotification(addViewModel: AddActivityViewModelAbstract,note:WorkSpaceEntity){
     val workManager = WorkManager.getInstance(Graph.appContext)
     val constraints = Constraints.Builder()
         .build()
@@ -143,7 +159,7 @@ class AddActivityViewModel
         .observeForever { workInfo->
             if(workInfo.state == WorkInfo.State.SUCCEEDED){
                 CoroutineScope(Dispatchers.IO).launch {
-                    createTaskStartNotification(addViewModel)
+                    createSuccessNotification(note)
                 }
 
             }
@@ -170,11 +186,11 @@ private fun createNotificationChannel(context: Context){
 
     }
 }
-private fun createSuccessNotification(){
+private fun createSuccessNotification(note: WorkSpaceEntity){
     val notification = 1
     val builder = NotificationCompat.Builder(Graph.appContext, "CHANNEL_ID")
         .setSmallIcon(R.drawable.baseline_access_time_24)
-        .setContentTitle("Success! Download complete ")
+        .setContentTitle("Success! Download complete ${note.time}")
         .setContentText("Your countdown completed successfully")
         .setPriority(NotificationCompat.PRIORITY_DEFAULT)
 
@@ -198,9 +214,9 @@ private fun createSuccessNotification(){
     }
 }
 
-private fun createTaskStartNotification(addViewModel: AddActivityViewModelAbstract){
+private fun createTaskStartNotification(addViewModel: AddActivityViewModelAbstract,note: WorkSpaceEntity){
     var itemList = listOf<WorkSpaceEntity>()
-    val item1 = mutableStateOf(listOf<WorkSpaceEntity>())
+    //val item1 = mutableStateOf(listOf<WorkSpaceEntity>())
 
 
     val scope = CoroutineScope(Dispatchers.IO)
@@ -216,7 +232,7 @@ private fun createTaskStartNotification(addViewModel: AddActivityViewModelAbstra
         "CHANNEL_ID"
     )   .setSmallIcon(R.drawable.baseline_access_time_24)
         .setContentTitle("Your task starts now")
-        .setContentText("Your task ${item1.value[1].text}, starts at ${item1.value[1].time} ")
+        .setContentText("Your task ${note.text}, starts at ${note.time} ")
         .setPriority(NotificationCompat.PRIORITY_HIGH)
     with(NotificationManagerCompat.from(Graph.appContext)){
         if (ActivityCompat.checkSelfPermission(
@@ -243,4 +259,3 @@ private fun createTaskStartNotification(addViewModel: AddActivityViewModelAbstra
     val intent = Intent(Graph.appContext, Notification::class.java)
     val title =
 }*/
-        */

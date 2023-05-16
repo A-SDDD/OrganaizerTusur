@@ -8,6 +8,7 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.*
 import com.danil.ogranizertusur.bottom_navigation.MainScreen
+import com.danil.ogranizertusur.schedule.screens.ScheduleViewModel
 import com.danil.ogranizertusur.ui.theme.OgranizerTusurTheme
 import com.danil.ogranizertusur.workspace.viewmodel.AddActivityViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -20,10 +21,11 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val addViewModel: AddActivityViewModel by viewModels()
+        val scheduleViewModel:ScheduleViewModel by viewModels()
         setContent {
             OgranizerTusurTheme (){
                 Column() {
-                    MainScreen(addViewModel = addViewModel)
+                    MainScreen(addViewModel = addViewModel, scheduleViewModel = scheduleViewModel)
                 }
             }
         }

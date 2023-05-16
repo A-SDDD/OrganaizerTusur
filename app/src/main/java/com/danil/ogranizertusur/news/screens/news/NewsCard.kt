@@ -1,4 +1,4 @@
-package com.danil.ogranizertusur.news.screens
+package com.danil.ogranizertusur.news.screens.news
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -17,14 +17,14 @@ import com.danil.ogranizertusur.ui.theme.LightBlue
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NewsCard(item: NewDataClass,
-onClickNews:(NewDataClass)->Unit){
+onClickNews:()->Unit){
 
     Card(
         modifier = Modifier
             .fillMaxWidth(1f)
             .padding(start = 16.dp, end = 16.dp),
         onClick = {
-            onClickNews(item)
+            onClickNews()
             LinkNews.link = item.link
         }
     ) {
@@ -41,7 +41,7 @@ onClickNews:(NewDataClass)->Unit){
 
             // on below line we are adding content
             // description for our image.
-            contentDescription = "gfg imageeqr ",
+            contentDescription = "gfg",
 
             // on below line we are adding modifier for our
             // image as wrap content for height and width.

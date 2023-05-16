@@ -5,6 +5,7 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.danil.ogranizertusur.schedule.domain.model.Schedule
 
 @Composable
 fun DropDownMenu(
@@ -12,8 +13,10 @@ fun DropDownMenu(
     selectedItem:MutableState<String>,
     groupsByFaculties:MutableState<List<String>>,
     facultyOrGroups:MutableState<Int>,
+    groupAndFacultyFromDb:State<List<Schedule>>,
     group:MutableState<String>,
-    update:MutableState<Int>
+    update:MutableState<Int>,
+    scheduleViewModel:ScheduleViewModel
 ){
 
     val list: List<String> = when(facultyOrGroups.value){
@@ -22,7 +25,7 @@ fun DropDownMenu(
             groupsByFaculties.value
         }
     }
-    
+
     Column(modifier = Modifier.padding(20.dp)) {
         DropdownMenu(
             expanded = expanded.value,
@@ -44,10 +47,22 @@ fun DropDownMenu(
                             facultyOrGroups.value = 2
                             expanded.value = false
                             expanded.value = true
+                            if(groupAndFacultyFromDb.value == emptyList<Schedule>()){
+                                scheduleViewModel.setSchedule(Schedule(id = 0,faculty = label, group = "гр."))
+                            }else{
+                                scheduleViewModel.setSchedule(Schedule(
+                                    id = 0, faculty = label, group = "гр."
+                                ))
+                            }
+
                         }
 
                         2->{
                             group.value = label
+                                scheduleViewModel.setSchedule(Schedule(
+                                    id = 0, faculty = groupAndFacultyFromDb.value[0].faculty, group = label
+                                ))
+
                             facultyOrGroups.value = 1
                             expanded.value = false
                             update.value = 2

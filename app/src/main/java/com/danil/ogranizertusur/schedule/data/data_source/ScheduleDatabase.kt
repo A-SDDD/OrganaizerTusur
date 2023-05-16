@@ -7,8 +7,11 @@ import com.danil.ogranizertusur.schedule.domain.model.Schedule
 
 @Database(
     entities = [Schedule::class],
-    version = 2
+    version = 1
 )
 abstract class ScheduleDatabase: RoomDatabase() {
     abstract val scheduleDao: ScheduleDao
+    companion object{
+        const val DATABASE_NAME="schedule_db"
+    }
 }

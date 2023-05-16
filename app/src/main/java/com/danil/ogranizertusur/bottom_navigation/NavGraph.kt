@@ -12,8 +12,10 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.danil.ogranizertusur.R
-import com.danil.ogranizertusur.news.screens.NewsInfo
+import com.danil.ogranizertusur.news.screens.news.NewsInfo
 import com.danil.ogranizertusur.news.screens.NewsScreen
+import com.danil.ogranizertusur.news.screens.calendar_events.EventInfo
+import com.danil.ogranizertusur.schedule.screens.ScheduleViewModel
 import com.danil.ogranizertusur.schedule.screens.TabDaysOfWeek
 import com.danil.ogranizertusur.workspace.screens.notes.AddActivity
 import com.danil.ogranizertusur.workspace.viewmodel.AddActivityViewModel
@@ -23,23 +25,24 @@ import com.danil.ogranizertusur.workspace.viewmodel.AddActivityViewModel
 fun NavGraph(
     navHostController: NavHostController,
     addViewModel: AddActivityViewModel,
+    scheduleViewModel: ScheduleViewModel
 ) {
-    NavHost(navController = navHostController, startDestination = "screen_1") {
+    NavHost(navController = navHostController, startDestination = "schedule") {
 
-        composable("screen_1") {
+        composable("schedule") {
 
-            TabDaysOfWeek()
+            TabDaysOfWeek(scheduleViewModel)
         }
 
-        composable("screen_2") {
-            Image(
+        composable("workspace") {
+           /* Image(
                 painter = painterResource(id = R.drawable.fon),
                 contentDescription = "fon2",
                 modifier = Modifier
                     .fillMaxSize()
                     .alpha(0.7f),
                 contentScale = ContentScale.FillBounds
-            )
+            )*/
             AddActivity(
                 addViewModel = addViewModel,
                 onClickNote = {
@@ -51,7 +54,7 @@ fun NavGraph(
             )
         }
 
-        composable("screen_3") {
+        composable("deadline") {
             Image(
                 painter = painterResource(id = R.drawable.fon),
                 contentDescription = "fon3",
@@ -60,10 +63,10 @@ fun NavGraph(
                     .alpha(0.7f),
                 contentScale = ContentScale.FillBounds
             )
-            TabDaysOfWeek()
+            TabDaysOfWeek(scheduleViewModel)
         }
 
-        composable("screen_4") {
+        composable("news") {
             /*Image(
                 painter = painterResource(id = R.drawable.fon),
                 contentDescription = "fon4",
@@ -74,6 +77,8 @@ fun NavGraph(
             )*/
             NewsScreen(onClickNews = {
                 navHostController.navigate("newsInfo")
+            }, onClickEvent = {
+                navHostController.navigate("eventInfo")
             }
             )
         }
@@ -86,8 +91,17 @@ fun NavGraph(
 
             )
         }
-        composable("newsInfo"){
-            NewsInfo()
+        composable("newsInfo") {
+            NewsInfo(onClickClose = {
+                navHostController.popBackStack()
+            }
+            )
+        }
+        composable("eventInfo") {
+            EventInfo(onClickClose = {
+                navHostController.popBackStack()
+            }
+            )
         }
 
     }
