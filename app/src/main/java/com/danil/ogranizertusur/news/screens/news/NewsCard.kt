@@ -3,6 +3,7 @@ package com.danil.ogranizertusur.news.screens.news
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -12,6 +13,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import com.danil.ogranizertusur.news.LinkNews
 import com.danil.ogranizertusur.news.NewDataClass
+import com.danil.ogranizertusur.ui.theme.GrayForEvent
 import com.danil.ogranizertusur.ui.theme.LightBlue
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -26,7 +28,8 @@ onClickNews:()->Unit){
         onClick = {
             onClickNews()
             LinkNews.link = item.link
-        }
+        },
+        colors = CardDefaults.cardColors(GrayForEvent)
     ) {
         Column(modifier = Modifier.
         fillMaxWidth()) {

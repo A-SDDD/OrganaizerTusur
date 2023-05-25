@@ -18,7 +18,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.danil.ogranizertusur.ui.theme.DarkRed
 import com.danil.ogranizertusur.ui.theme.LightBlue
+import com.danil.ogranizertusur.ui.theme.darkBack
 import com.danil.ogranizertusur.workspace.room_model.WorkSpaceEntity
 import com.danil.ogranizertusur.workspace.viewmodel.AddActivityViewModelAbstract
 
@@ -38,9 +40,9 @@ fun NoteListItem(
             val direction = dismissState.dismissDirection ?: return@SwipeToDismiss
             val color by animateColorAsState(
                 when (dismissState.targetValue) {
-                    DismissValue.Default -> LightBlue
-                    DismissValue.DismissedToEnd -> Color.Red
-                    DismissValue.DismissedToStart -> Color.Red
+                    DismissValue.Default -> MaterialTheme.colors.background
+                    DismissValue.DismissedToEnd -> DarkRed
+                    DismissValue.DismissedToStart -> DarkRed
                 }
             )
             val alignment = when (direction) {
@@ -48,7 +50,7 @@ fun NoteListItem(
                 DismissDirection.EndToStart -> Alignment.CenterEnd
             }
             val iconTint = when (dismissState.targetValue) {
-                DismissValue.Default -> Color.Red
+                DismissValue.Default -> DarkRed
                 DismissValue.DismissedToEnd -> Color.White
                 DismissValue.DismissedToStart -> Color.White
             }
@@ -80,7 +82,7 @@ fun NoteListItem(
                         onClick()
                     },
                     onLongClick = {
-
+                        onClick()
                         //
                         //onDelete()
                     }

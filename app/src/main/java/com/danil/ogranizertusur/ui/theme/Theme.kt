@@ -5,26 +5,36 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
+import com.danil.ogranizertusur.schedule.ThemeStatusObj
 
 private val DarkColorPalette = darkColors(
-    primary = Purple200,
+    primary = DarkBlue,
     primaryVariant = Purple700,
-    secondary = Teal200
+    secondary = Teal200,
+    background = darkBack,
+    surface = NoteColor,
+    onPrimary = Color.White,
+    onSecondary = NoteText,
+    onBackground = NoteText,
+    onSurface = NoteText,
+    error = DarkRed,
+    onError = Color.White
 )
 
 private val LightColorPalette = lightColors(
-    primary = Purple500,
+    primary = LightBlue,
     primaryVariant = Purple700,
-    secondary = Teal200
-
-    /* Other default colors to override
+    secondary = Teal200,
     background = Color.White,
-    surface = Color.White,
+    surface = LightNoteColor,
     onPrimary = Color.White,
     onSecondary = Color.Black,
     onBackground = Color.Black,
     onSurface = Color.Black,
-    */
+    error = DarkRed,
+    onError = Color.White
+
 )
 
 @Composable
@@ -34,8 +44,10 @@ fun OgranizerTusurTheme(
 ) {
     val colors = if (darkTheme) {
         DarkColorPalette
+
     } else {
         LightColorPalette
+
     }
 
     MaterialTheme(
@@ -44,4 +56,9 @@ fun OgranizerTusurTheme(
         shapes = Shapes,
         content = content
     )
+    if (darkTheme){
+        ThemeStatusObj.provide(true)
+    }else{
+        ThemeStatusObj.provide(false)
+    }
 }

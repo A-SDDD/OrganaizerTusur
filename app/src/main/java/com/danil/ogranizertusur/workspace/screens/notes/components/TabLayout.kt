@@ -13,6 +13,8 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.danil.ogranizertusur.ui.theme.LightBlue
+import com.danil.ogranizertusur.ui.theme.darkBack
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.PagerState
@@ -38,13 +40,12 @@ fun TabLayout(
                     Modifier.pagerTabIndicatorOffset(pagerState, pos)
                 )
             },
-
             modifier = Modifier
                 .fillMaxWidth(1.0f)
                 .padding(start = 16.dp, bottom = 16.dp, end = 16.dp)
                 .fillMaxHeight(0.05f)
                 .alpha(0.9f),
-            backgroundColor = Color.White
+            backgroundColor = MaterialTheme.colors.background
         )
         {
             tabList.forEachIndexed { index, text ->
@@ -56,14 +57,14 @@ fun TabLayout(
                         }
                     },
                     text = {
-                        Text(text = text, color = Color(0xFF2B5CA8))
+                        Text(text = text, color = MaterialTheme.colors.onPrimary)
                     },
                     modifier = Modifier
                         .background(
-                            Color.White,
+                            MaterialTheme.colors.primary,
                             RoundedCornerShape(20.dp)
                         )
-                        .border(2.dp,Color(0xFF2B5CA8), shape = RoundedCornerShape(20.dp))
+                        .border(2.dp, Color(0xFF2B5CA8), shape = RoundedCornerShape(20.dp))
                         .fillMaxWidth(0.4f)
                 )
             }

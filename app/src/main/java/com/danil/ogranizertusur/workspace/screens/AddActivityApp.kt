@@ -8,6 +8,6 @@ import dagger.hilt.android.HiltAndroidApp
 class AddActivityApp: Application() {
     override fun onCreate() {
         super.onCreate()
-        Graph.provide(this)
+        //Graph.provide(this)
     }
 }

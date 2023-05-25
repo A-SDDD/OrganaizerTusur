@@ -1,6 +1,7 @@
 package com.danil.ogranizertusur.schedule.screens
 
 import android.annotation.SuppressLint
+import android.graphics.Color.alpha
 import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -23,7 +24,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.danil.ogranizertusur.R
 import com.danil.ogranizertusur.schedule.ScheduleInfoDataClass
+import com.danil.ogranizertusur.schedule.ThemeStatusObj
 import com.danil.ogranizertusur.schedule.domain.model.Schedule
+import com.danil.ogranizertusur.ui.theme.DarkBlue
 import com.danil.ogranizertusur.ui.theme.LightBlue
 import com.google.accompanist.pager.*
 import kotlinx.coroutines.*
@@ -198,7 +201,7 @@ fun TabDaysOfWeek(scheduleViewModel:ScheduleViewModel) {
                             onClick = {
                                 expandedForDropDownMenu.value = !expandedForDropDownMenu.value
                             },
-                            colors = ButtonDefaults.buttonColors(Color.White),
+                            colors = ButtonDefaults.buttonColors(MaterialTheme.colors.background),
                             modifier = Modifier
                                 .fillMaxHeight(0.9f)
                                 .padding(
@@ -207,7 +210,9 @@ fun TabDaysOfWeek(scheduleViewModel:ScheduleViewModel) {
                                 )
                         ) {
                             Text(
-                                "${faculty.value} и ${group.value}",
+                                text = if(itemListState.value[0].faculty!="ф." || itemListState.value[0].faculty!=""){
+                                    "${itemListState.value[0].faculty} ${itemListState.value[0].group}"
+                                } else{"${faculty.value} и ${group.value}"},
                                 color = LightBlue,
                                 fontSize = 12.sp
                             )
@@ -226,7 +231,7 @@ fun TabDaysOfWeek(scheduleViewModel:ScheduleViewModel) {
                                     }
                                 }
                             },
-                            colors = ButtonDefaults.buttonColors(Color.White),
+                            colors = ButtonDefaults.buttonColors(MaterialTheme.colors.background),
                             modifier = Modifier
                                 .fillMaxHeight(0.9f)
                                 .padding(top = 2.dp)
@@ -239,7 +244,7 @@ fun TabDaysOfWeek(scheduleViewModel:ScheduleViewModel) {
                         }
                     }
                 },
-                backgroundColor = Color.White,
+                backgroundColor = MaterialTheme.colors.background,
                 contentColor = LightBlue
             )
         },
@@ -249,8 +254,12 @@ fun TabDaysOfWeek(scheduleViewModel:ScheduleViewModel) {
         }
     ) {
         Image(
-            painter = painterResource(id = R.drawable.fon),
-            contentDescription = "fon1",
+            painter = if(ThemeStatusObj.theme){
+                painterResource(id = R.drawable.fon_night)
+            }else{
+                painterResource(id = R.drawable.fon)
+                 },
+            contentDescription = "fon",
             modifier = Modifier
                 .fillMaxSize()
                 .alpha(0.7f),
@@ -282,7 +291,7 @@ fun TabDaysOfWeek(scheduleViewModel:ScheduleViewModel) {
                             .fillMaxWidth(1.0f)
                             .alpha(0.9f)
                             .clip(shape = RoundedCornerShape(5.dp)),
-                        backgroundColor = Color.White,
+                        backgroundColor = MaterialTheme.colors.background.copy(alpha =0f),
                         divider = { Divider(color = LightBlue, startIndent = 2.dp)},
                     ) {
                         tabList.forEachIndexed { index, text ->
@@ -321,7 +330,7 @@ fun TabDaysOfWeek(scheduleViewModel:ScheduleViewModel) {
                                                 shape = RoundedCornerShape(20.dp)
                                             )
                                             .background(
-                                                if (pagerState.currentPage == index) Color.Blue
+                                                if (pagerState.currentPage == index) DarkBlue
                                                 else LightBlue,
                                                 RoundedCornerShape(20.dp)
                                             )

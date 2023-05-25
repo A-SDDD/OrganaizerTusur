@@ -17,6 +17,7 @@ import com.danil.ogranizertusur.news.screens.NewsScreen
 import com.danil.ogranizertusur.news.screens.calendar_events.EventInfo
 import com.danil.ogranizertusur.schedule.screens.ScheduleViewModel
 import com.danil.ogranizertusur.schedule.screens.TabDaysOfWeek
+import com.danil.ogranizertusur.settings.SettingsScreen
 import com.danil.ogranizertusur.workspace.screens.notes.AddActivity
 import com.danil.ogranizertusur.workspace.viewmodel.AddActivityViewModel
 
@@ -25,7 +26,7 @@ import com.danil.ogranizertusur.workspace.viewmodel.AddActivityViewModel
 fun NavGraph(
     navHostController: NavHostController,
     addViewModel: AddActivityViewModel,
-    scheduleViewModel: ScheduleViewModel
+    scheduleViewModel: ScheduleViewModel,
 ) {
     NavHost(navController = navHostController, startDestination = "schedule") {
 
@@ -35,14 +36,6 @@ fun NavGraph(
         }
 
         composable("workspace") {
-           /* Image(
-                painter = painterResource(id = R.drawable.fon),
-                contentDescription = "fon2",
-                modifier = Modifier
-                    .fillMaxSize()
-                    .alpha(0.7f),
-                contentScale = ContentScale.FillBounds
-            )*/
             AddActivity(
                 addViewModel = addViewModel,
                 onClickNote = {
@@ -53,7 +46,6 @@ fun NavGraph(
                 }
             )
         }
-
         composable("deadline") {
             Image(
                 painter = painterResource(id = R.drawable.fon),
@@ -67,42 +59,32 @@ fun NavGraph(
         }
 
         composable("news") {
-            /*Image(
-                painter = painterResource(id = R.drawable.fon),
-                contentDescription = "fon4",
-                modifier = Modifier
-                    .fillMaxSize()
-                    .alpha(0.7f),
-                contentScale = ContentScale.FillBounds
-            )*/
             NewsScreen(onClickNews = {
                 navHostController.navigate("newsInfo")
             }, onClickEvent = {
                 navHostController.navigate("eventInfo")
-            }
-            )
+            })
         }
 
         composable("addNote") {
-            AddNoteScreen(addViewModel,
+            AddNoteScreen(
+                addViewModel,
                 onClickClose = {
                     navHostController.popBackStack()
-                },
-
-            )
+                })
         }
         composable("newsInfo") {
             NewsInfo(onClickClose = {
                 navHostController.popBackStack()
-            }
-            )
+            })
         }
         composable("eventInfo") {
             EventInfo(onClickClose = {
                 navHostController.popBackStack()
-            }
-            )
+            })
         }
-
+        composable("settings"){
+            SettingsScreen()
+        }
     }
 }

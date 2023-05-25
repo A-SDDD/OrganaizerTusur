@@ -1,6 +1,7 @@
 package com.danil.ogranizertusur.workspace.screens.add_edit_notes
 
 import android.app.TimePickerDialog
+import android.widget.TimePicker
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -13,6 +14,7 @@ import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Done
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
@@ -23,14 +25,20 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
 import com.danil.ogranizertusur.R
+import com.danil.ogranizertusur.ui.theme.LightBlue
+import com.danil.ogranizertusur.workspace.alarm_scheduler.AlarmItem
 import com.danil.ogranizertusur.workspace.room_model.WorkSpaceEntity
 import com.danil.ogranizertusur.workspace.viewmodel.AddActivityViewModelAbstract
 import com.vanpra.composematerialdialogs.MaterialDialog
+import com.vanpra.composematerialdialogs.datetime.date.DatePickerDefaults
 import com.vanpra.composematerialdialogs.datetime.date.datepicker
+import com.vanpra.composematerialdialogs.datetime.time.TimePickerDefaults
+import com.vanpra.composematerialdialogs.datetime.time.timepicker
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
+import java.time.format.TextStyle
 import java.util.*
 
 @Suppress("OPT_IN_IS_NOT_ENABLED")
@@ -46,10 +54,13 @@ fun AddNoteScreen(
     val timeState = rememberSaveable { mutableStateOf(note?.time ?: "") }
     val statusState = rememberSaveable { mutableStateOf(note?.status ?: false) }
 
+    //alarmManager
+    val scheduler = addViewModel.scheduler
+    var alarmItem: AlarmItem? = null
+    //
     //dataPicker values
     val mContext = LocalContext.current
 
- 
     val mCalendar = Calendar.getInstance()
 
     var pickedDate by remember {
@@ -59,21 +70,28 @@ fun AddNoteScreen(
         mutableStateOf(LocalTime.NOON)
     }
     val formattedDate by remember {
-        derivedStateOf{
+        derivedStateOf {
             DateTimeFormatter
                 .ofPattern("dd.MM.yyyy")
                 .format(pickedDate)
         }
     }
     val formattedTime by remember {
-        derivedStateOf{
+        derivedStateOf {
             DateTimeFormatter
-                .ofPattern("hh:mm")
+                .ofPattern("HH:mm")
+                .format(pickedTime)
+        }
+    }
+    val formattedTimeOne by remember {
+        derivedStateOf {
+            DateTimeFormatter
+                .ofPattern("H:mm")
                 .format(pickedTime)
         }
     }
     val dateDialogState = rememberMaterialDialogState()
-   // val timeDialogState = rememberMaterialDialogState()
+    val timeDialogState = rememberMaterialDialogState()
     //timePicker
 
     // Declaring and initializing a calendar
@@ -87,10 +105,10 @@ fun AddNoteScreen(
 
     val mTimePickerDialog = TimePickerDialog(
         mContext,
-        {_, mHour : Int, mMinute: Int ->
+        { _, mHour: Int, mMinute: Int ->
             var minute = mMinute.toString()
             val hour = mHour.toString()
-            if(mMinute.toString().length == 1){
+            if (mMinute.toString().length == 1) {
                 minute = "0$mMinute"
             }
 
@@ -102,7 +120,11 @@ fun AddNoteScreen(
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
-                    Text(text = "Задача", fontSize = 24.sp)
+                    Text(
+                        text = "Задача",
+                        fontSize = 24.sp,
+                        color = MaterialTheme.colors.onSurface
+                    )
                 },
                 actions = {
                     IconButton(onClick = {
@@ -123,6 +145,7 @@ fun AddNoteScreen(
                                         status = statusState.value
                                     )
                                 )
+
                                 Toast.makeText(
                                     mContext.applicationContext,
                                     "Задача обнавлена",
@@ -138,6 +161,16 @@ fun AddNoteScreen(
                                         status = statusState.value
                                     )
                                 )
+                                println("Alarm triggered: ${dateState.value}, ${timeState.value}, ${textState.value}")
+                                val localDateTime = addViewModel.convertToLocalDateTime(
+                                    dateState.value,
+                                    timeState.value
+                                )
+                                alarmItem = AlarmItem(
+                                    time = localDateTime,
+                                    text = "Установленная вами задача:${textState.value} стартует прямо сейчас! "
+                                )
+                                alarmItem?.let(scheduler::schedule)
                                 Toast.makeText(
                                     mContext.applicationContext,
                                     "Задача добавлена",
@@ -160,8 +193,8 @@ fun AddNoteScreen(
                     IconButton(onClick = onClickClose) {
                         Icon(imageVector = Icons.Rounded.ArrowBack, contentDescription = "Close")
                     }
-                }
-
+                },
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(MaterialTheme.colors.background)
 
             )
         },
@@ -180,25 +213,28 @@ fun AddNoteScreen(
                 .verticalScroll(rememberScrollState(0))
         ) {
 
-          Row(){
-           Text(
-               text = "Выберите дату",
-               modifier = Modifier.padding(
-                   top = 16.dp,
-                   start = 24.dp,
-                   bottom = 16.dp,
-               )
-           )
-          IconButton(onClick = {
-              dateDialogState.show()
-              //mDatePickerDialog.show()
-          }) {
-              Icon(painter = painterResource(
-                  id = R.drawable.baseline_calendar_month_24),
-                  contentDescription = "Date", tint = Color.Blue)
-          }
-          }
-            BasicTextField(modifier = Modifier
+            Row() {
+                Text(
+                    text = "Выберите дату",
+                    modifier = Modifier.padding(
+                        top = 16.dp,
+                        start = 24.dp,
+                        bottom = 16.dp,
+                    )
+                )
+                IconButton(onClick = {
+                    dateDialogState.show()
+                    //mDatePickerDialog.show()
+                }) {
+                    Icon(
+                        painter = painterResource(
+                            id = R.drawable.baseline_calendar_month_24
+                        ),
+                        contentDescription = "Date", tint = Color.Blue
+                    )
+                }
+            }
+            Text(modifier = Modifier
                 .padding(
                     start = 16.dp,
                     top = 16.dp,
@@ -206,10 +242,8 @@ fun AddNoteScreen(
                 )
                 .fillMaxWidth(),
                 //  .fillMaxHeight(0.3f),
-                value = dateState.value,
-                onValueChange = { date ->
-                    dateState.value = date
-                }
+                text = dateState.value,
+                color = MaterialTheme.colors.onSurface
             )
 
             Row() {
@@ -222,8 +256,8 @@ fun AddNoteScreen(
                     )
                 )
                 IconButton(onClick = {
-                    //timeDialogState.show()
-                    mTimePickerDialog.show()
+                    timeDialogState.show()
+                    //mTimePickerDialog.show()
                 }) {
                     Icon(
                         painter = painterResource(
@@ -233,7 +267,7 @@ fun AddNoteScreen(
                     )
                 }
             }
-            BasicTextField(modifier = Modifier
+            Text(modifier = Modifier
                 .padding(
                     start = 16.dp,
                     top = 16.dp,
@@ -242,10 +276,8 @@ fun AddNoteScreen(
                 )
                 .fillMaxWidth(),
                 //   .fillMaxHeight(0.3f),
-                value = timeState.value,
-                onValueChange = { time ->
-                    timeState.value = time
-                }
+                text = timeState.value,
+                color = MaterialTheme.colors.onSurface
             )
             Text(
                 text = "Введите задачу",
@@ -253,7 +285,7 @@ fun AddNoteScreen(
                     top = 16.dp,
                     start = 24.dp,
                     bottom = 16.dp
-                )
+                ),
             )
             BasicTextField(modifier = Modifier
                 .padding(
@@ -267,10 +299,12 @@ fun AddNoteScreen(
                 value = textState.value,
                 onValueChange = { txt ->
                     textState.value = txt
-                }
+                },
+                textStyle = androidx.compose.ui.text.TextStyle(
+                    color = MaterialTheme.colors.onSurface,
+                    fontSize = 20.sp
+                )
             )
-
-
         }
     }
     MaterialDialog(
@@ -279,50 +313,69 @@ fun AddNoteScreen(
             dismissOnClickOutside = true
         ),
         buttons = {
-            positiveButton(text = "Ok"){
+            positiveButton(
+                text = "Ок",
+                textStyle = androidx.compose.ui.text.TextStyle(color = MaterialTheme.colors.onSurface)
+            ) {
                 Toast.makeText(
                     mContext.applicationContext,
-                    "Clicked ok",
+                    "Дата задачи установлена",
                     Toast.LENGTH_LONG
                 ).show()
             }
-            negativeButton(text = "Cancel")
+            negativeButton(
+                text = "Закрыть",
+                textStyle = androidx.compose.ui.text.TextStyle(color = MaterialTheme.colors.onSurface)
+            )
         }
     ) {
         datepicker(
             LocalDate.now(),
             title = "Выберите дату",
-
-        ){
+            colors = DatePickerDefaults.colors(LightBlue)
+            ) {
             pickedDate = it
             dateState.value = formattedDate
         }
     }
-
-   /* MaterialDialog(
+    MaterialDialog(
         dialogState = timeDialogState,
         properties = DialogProperties(
             dismissOnClickOutside = true
         ),
         buttons = {
-            positiveButton(text = "Ok"){
+            positiveButton(
+                text = "Ок",
+                textStyle = androidx.compose.ui.text.TextStyle(color = MaterialTheme.colors.onSurface)
+            ) {
                 Toast.makeText(
                     mContext.applicationContext,
-                    "Clicked ok",
+                    "Время задачи установлено",
                     Toast.LENGTH_LONG
                 ).show()
             }
-            negativeButton(text = "Cancel")
+            negativeButton(
+                text = "Закрыть",
+                textStyle = androidx.compose.ui.text.TextStyle(color = MaterialTheme.colors.onSurface)
+            )
         }
     ) {
         timepicker(
             LocalTime.now(),
-            title = "Выберите дату",
+            title = "Выберите время",
+            colors = TimePickerDefaults.colors(LightBlue),
+            timeRange = LocalTime.MIN..LocalTime.MAX,
             is24HourClock = true,
-            timeRange = LocalTime.MIN..LocalTime.MAX
-            ){
+        ) {
             pickedTime = it
-            timeState.value = formattedTime
+            timeState.value = if (pickedTime.hour<10 && pickedTime.hour != 0){
+                formattedTimeOne
+            }else{
+                formattedTime
+            }
+
+
+
         }
-    }*/
+    }
 }
