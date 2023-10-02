@@ -5,8 +5,8 @@
 3 модуль представляет собой раздел с новостями и событиями происходящими в рамках учебного заведения ТУСУР. P.s. К настоящему моменту может работать некорректно.
 
 
-![image](https://github.com/A-SDDD/OrganaizerTusur/assets/93522809/05c1426c-989a-4791-9c03-4bff6dcefd86)
-
+![image](https://github.com/A-SDDD/OrganaizerTusur/assets/93522809/4112bdf6-f4aa-4dcb-ba93-d381bcead983)
+![image](https://github.com/A-SDDD/OrganaizerTusur/assets/93522809/e8fcff43-af40-435b-ab13-d7606db5d7fc)
 
 ![image](https://github.com/hoziaintusura/OrganaizerTusur/assets/93522809/b6cdb0c8-a9bd-4042-af40-acbb83866196)
 ![image](https://github.com/hoziaintusura/OrganaizerTusur/assets/93522809/c2ec0993-f8a3-43cd-a7cc-f5075601cb2a)
